@@ -57,36 +57,92 @@ The main visualization is an interactive **treemap** where:
 - **Layout** groups occupations by BLS category
 - **Hover** shows detailed tooltip with pay, jobs, outlook, education, exposure score, and LLM rationale
 
+## Deploy to GitHub Pages (standard branch deploy)
+
+Yes — after these changes you can deploy and open the site in a browser as a static site, without running Python/uv on the server.
+
+- The repository has a GitHub Actions workflow that deploys the `site/` folder to GitHub Pages.
+- Push your branch to `master` or `main` and GitHub will publish it.
+- For custom branches, open **Actions → Deploy static content to Pages → Run workflow**.
+
+After deployment, open the Pages URL from **Settings → Pages** (or from the workflow output).
+
 ## Setup
 
-```
-uv sync
-uv run playwright install chromium
+### Standard Python deployment (without uv / virtualenv)
+
+```bash
+python3 -m pip install -r requirements.txt
 ```
 
-Requires an OpenRouter API key in `.env`:
+### Alternative: uv workflow
+
+```bash
+uv sync
+```
+
+Requires an OpenRouter API key in `.env` only if you run scoring:
 ```
 OPENROUTER_API_KEY=your_key_here
 ```
 
-## Usage
+## Quick start (recommended after clone)
+
+If you only want to open the project as-is (with current committed data), no scraping/scoring is required:
 
 ```bash
-# Scrape BLS pages (only needed once, results are cached in html/)
-uv run python scrape.py
+cd site
+python3 -m http.server 8000
+```
 
+Then open `http://localhost:8000`.
+
+## Full pipeline
+
+### Standard Python commands (no uv)
+
+```bash
 # Generate Markdown from HTML
-uv run python process.py
+python3 process.py
 
 # Generate CSV summary
-uv run python make_csv.py
-
-# Score AI exposure (uses OpenRouter API)
-uv run python score.py
+python3 make_csv.py
 
 # Build website data
-uv run python build_site_data.py
+python3 build_site_data.py
+
+# Optional: score AI exposure (requires OPENROUTER_API_KEY)
+python3 score.py
+python3 build_site_data.py
 
 # Serve the site locally
+cd site && python3 -m http.server 8000
+```
+
+### Same pipeline with uv
+
+```bash
+uv run python process.py
+uv run python make_csv.py
+uv run python build_site_data.py
+
+# Optional: score AI exposure (requires OPENROUTER_API_KEY)
+uv run python score.py
+uv run python build_site_data.py
+
 cd site && python -m http.server 8000
+```
+
+### Optional: scrape data from BLS again
+
+Scraping is optional because `html/` is already committed. If you still want fresh raw pages:
+
+```bash
+# standard python
+python3 -m playwright install chromium
+python3 scrape.py
+
+# or uv
+uv run playwright install chromium
+uv run python scrape.py
 ```
