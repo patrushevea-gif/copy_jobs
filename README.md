@@ -67,8 +67,6 @@ Yes — after these changes you can deploy and open the site in a browser as a s
 
 After deployment, open the Pages URL from **Settings → Pages** (or from the workflow output).
 
-If Pages is configured to serve repository root (instead of GitHub Actions artifact), opening the root URL can show README. This repo now includes a root `index.html` that redirects to `site/`, so the interactive app opens by default.
-
 ## Setup
 
 ### Standard Python deployment (without uv / virtualenv)
